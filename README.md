@@ -86,6 +86,33 @@ If you have any questions or would like to connect, please don't hesitate to rea
     </picture>
 </p>
 
+---
+
+## Reminder Scheduling Optimization
+This logic is implemented in the `ReminderScheduler` and `ReminderRepository`
+using scheduled jobs and optimized JPA queries.
+
+### Problem
+The application previously scanned all borrow records daily to identify
+upcoming due dates, resulting in unnecessary database load and performance
+bottlenecks.
+
+### Solution
+A dedicated `Reminder` entity is now created when a book is borrowed.
+The scheduler queries only reminders that are due on a given date,
+eliminating full table scans.
+
+### Key Improvements
+- Reduced number of database queries
+- Improved performance and scalability
+- Cleaner separation of concerns
+
+### Edge Case Handling
+- Book renewals update the scheduled reminder date
+- Early returns remove pending reminders
+- Overdue reminders trigger daily notifications with dynamic fine calculation
+
+---
 
 ## Thankyou ❤️
 Thank you for taking the time to explore my project. I hope you find them informative and useful in your journey to learn Java and enhance your programming skills. Your support and contributions are highly appreciated.
