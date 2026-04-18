@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.*;
  * This controller provides endpoints for performing CRUD operations on books,
  * including retrieving all books, getting a book by its ID, adding a new book,
  * updating an existing book, and deleting a book.
+ * * Version: 1.1
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/books") //Versioning API path -> provide more context 
 public class BookController {
 
     @Autowired
@@ -80,7 +81,8 @@ public class BookController {
 
     /**
      * Updates an existing book in the library.
-     *
+     * This operation is restricted to LIBRARIAN and ADMIN roles.
+     * 
      * @param id             the ID of the book to update.
      * @param bookDtoDetails the {@link Book} object containing the updated book details.
      * @return the updated {@link Book} object.
@@ -93,13 +95,15 @@ public class BookController {
 
     /**
      * Deletes a book from the library by its ID.
+     * Provides confirmation message upon successful deletion.
      *
      * @param id the ID of the book to delete.
      */
     @DeleteMapping("delete-book/{id}")
     @PreAuthorize("hasRole('LIBRARIAN') or hasRole('ADMIN')")
-    public void deleteBook(@PathVariable int id) {
+    public ResponseEntity<String> deleteBook(@PathVariable int id) {
         bookService.deleteBook(id);
+        return ResponseEntity.ok("Book with ID " + id + " has been successfully deleted from the system.");    
     }
 
     /**

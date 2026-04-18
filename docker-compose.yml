@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: libraryman-db
+    environment:
+      MYSQL_DATABASE: libraryman
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  api:
+    build: .
+    container_name: libraryman-api-staging
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/libraryman
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_MAIL_HOST=localhost
+      - SPRING_MAIL_PORT=25
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=false
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=false
+      - SPRING_MAIL_PROPERTIES_DOMAIN_NAME=libraryman.com
+      # DISABLE OAUTH2 FEATURES COMPLETELY
+      - SPRING_SECURITY_OAUTH2_CLIENT_ENABLED=false
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_ENABLED=false
+      # PROVIDE A DUMMY REGISTRATION JUST IN CASE THE BEAN SCANNER STILL LOOKS
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=dummy
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=dummy
