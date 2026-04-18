@@ -1,0 +1,46 @@
+name: LibraryMan-API CI Pipeline
+
+# 1. Automated Triggers: Triggers on every push or PR to key branches
+on:
+  push:
+    branches: [ "main", "Build", "Test", "Deploy", "CI" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 2. Setup Phase
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Automation Phase
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
+
+      - name: Build and Execute 111 Unit Tests
+        # This automates the build and test process within the pipeline
+        run: ./mvnw clean test
+
+      - name: Generate JaCoCo Coverage Report
+        # This generates the report for the "Accessible Reports" requirement
+        run: ./mvnw jacoco:report
+
+      # 4. Reporting Phase (Deliverables)
+      - name: Archive Test & Coverage Reports
+        if: always() # Ensures reports are uploaded even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: assignment-reports
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/

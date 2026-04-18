@@ -1,0 +1,14 @@
+Fixes #1
+
+Modernize the CI pipeline to produce accessible test and coverage reports as downloadable artifacts.
+
+### Workflow (`build-test-lint-format.yml`)
+- Upgrade `actions/checkout`, `actions/setup-java`, to **v4**
+- Replace commented-out `actions/cache@v3` with `setup-java`'s built-in `cache: 'maven'`
+- Switch from `mvn` to `./mvnw` for reproducible builds via the Maven wrapper
+- Add `actions/upload-artifact@v4` (`if: always()`) to archive Surefire + JaCoCo reports
+
+### Build (`pom.xml`)
+- Add `jacoco-maven-plugin` 0.8.12 with `prepare-agent` and `report` goals bound to the `test` phase
+
+After this, every push/PR run will produce a downloadable `test-reports` artifact containing `target/surefire-reports/` and `target/site/jacoco/.
